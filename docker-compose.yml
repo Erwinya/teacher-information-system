@@ -1,16 +1,36 @@
 services:
-  postgresql:
-    image: postgres:16
-    container_name: postgres_db
+  postgres:
+    image: postgres:16-alpine
+    container_name: tis-postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: managerDb
       POSTGRES_USER: erwinya
       POSTGRES_PASSWORD: 12345678
     ports:
-      - 5433:5433
+      - "5433:5432"
     volumes:
       - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U erwinya -d managerDb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  teacher-information-system:
+    build: .
+    container_name: tis-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/managerDb
+      DB_USERNAME: erwinya
+      DB_PASSWORD: 12345678
+      SERVER_PORT: "8081"
+    ports:
+      - "8081:8081"
 
 volumes:
   pg_data:

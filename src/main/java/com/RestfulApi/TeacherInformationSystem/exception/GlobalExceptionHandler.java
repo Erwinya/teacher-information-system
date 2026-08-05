@@ -3,6 +3,7 @@ package com.RestfulApi.TeacherInformationSystem.exception;
 import com.RestfulApi.TeacherInformationSystem.response.CustomResponse;
 import com.RestfulApi.TeacherInformationSystem.util.ApiResponseUtil;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -10,46 +11,56 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(RuntimeException.class)
-    public CustomResponse<?> handleRuntimeException(RuntimeException ex) {
-        return ApiResponseUtil.error(ex.getMessage(), HttpStatus.BAD_REQUEST.value());
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public CustomResponse<?> handleValidationException(MethodArgumentNotValidException ex) {
-        String message = ex.getBindingResult().getFieldErrors().stream()
-                .map(error -> error.getField() + ": " + error.getDefaultMessage())
-                .findFirst().orElse("Validation error");
-        return ApiResponseUtil.error(message, HttpStatus.BAD_REQUEST.value());
-    }
-
-    @ExceptionHandler(Exception.class)
-    public CustomResponse<?> handleGenericException(Exception ex) {
-        return ApiResponseUtil.error("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR.value());
-    }
-
     @ExceptionHandler(ManagerNotFoundException.class)
-    public CustomResponse<?> handleManagerNotFound(ManagerNotFoundException ex) {
-        return ApiResponseUtil.error(ex.getMessage(), HttpStatus.NOT_FOUND.value());
-    }
-
-    @ExceptionHandler(DuplicateEmailException.class)
-    public CustomResponse<?> handleDuplicateEmail(DuplicateEmailException ex) {
-        return ApiResponseUtil.error(ex.getMessage(), HttpStatus.CONFLICT.value());
+    public ResponseEntity<CustomResponse<?>> handleManagerNotFound(ManagerNotFoundException ex) {
+        return build(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(TeacherNotFoundException.class)
-    public CustomResponse<?> handleTeacherNotFound(TeacherNotFoundException ex) {
-        return ApiResponseUtil.error(ex.getMessage(), HttpStatus.NOT_FOUND.value());
+    public ResponseEntity<CustomResponse<?>> handleTeacherNotFound(TeacherNotFoundException ex) {
+        return build(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(StudentNotFoundException.class)
-    public CustomResponse<?> handleStudentNotFound(StudentNotFoundException ex) {
-        return ApiResponseUtil.error(ex.getMessage(), HttpStatus.NOT_FOUND.value());
+    public ResponseEntity<CustomResponse<?>> handleStudentNotFound(StudentNotFoundException ex) {
+        return build(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(SchoolClassNotFoundException.class)
-    public CustomResponse<?> handleSchoolClassNotFound(SchoolClassNotFoundException ex) {
-        return ApiResponseUtil.error(ex.getMessage(), HttpStatus.NOT_FOUND.value());
+    public ResponseEntity<CustomResponse<?>> handleSchoolClassNotFound(SchoolClassNotFoundException ex) {
+        return build(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<CustomResponse<?>> handleResourceNotFound(ResourceNotFoundException ex) {
+        return build(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(DuplicateEmailException.class)
+    public ResponseEntity<CustomResponse<?>> handleDuplicateEmail(DuplicateEmailException ex) {
+        return build(ex.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<CustomResponse<?>> handleValidationException(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .findFirst()
+                .orElse("Validation error");
+        return build(message, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<CustomResponse<?>> handleRuntimeException(RuntimeException ex) {
+        return build(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<CustomResponse<?>> handleGenericException(Exception ex) {
+        return build("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private ResponseEntity<CustomResponse<?>> build(String message, HttpStatus status) {
+        return ResponseEntity.status(status).body(ApiResponseUtil.error(message, status.value()));
     }
 }
