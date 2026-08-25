@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import jakarta.validation.Valid;
 
 @RestController
 @AllArgsConstructor
@@ -27,7 +28,7 @@ public class TeacherController {
             @ApiResponse(responseCode = "409", description = "Duplicate email")
     })
     @PostMapping
-    public CustomResponse<TeacherDTO> createTeacher(@RequestBody TeacherDTO teacherDTO) {
+    public CustomResponse<TeacherDTO> createTeacher(@Valid @RequestBody TeacherDTO teacherDTO) {
         var createdTeacher = teacherService.createTeacher(TeacherMapper.toEntity(teacherDTO));
         return ApiResponseUtil.success(TeacherMapper.toDto(createdTeacher));
     }
@@ -61,7 +62,7 @@ public class TeacherController {
             @ApiResponse(responseCode = "409", description = "Duplicate email")
     })
     @PutMapping("/{id}")
-    public CustomResponse<TeacherDTO> updateTeacher(@PathVariable String id, @RequestBody TeacherDTO teacherDTO) {
+    public CustomResponse<TeacherDTO> updateTeacher(@PathVariable String id, @Valid @RequestBody TeacherDTO teacherDTO) {
         var updatedTeacher = teacherService.updateTeacher(id, TeacherMapper.toEntity(teacherDTO));
         return ApiResponseUtil.success(TeacherMapper.toDto(updatedTeacher));
     }

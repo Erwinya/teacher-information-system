@@ -19,6 +19,7 @@ public class SchoolClassServiceImpl implements SchoolClassService {
     
     @Override
     public SchoolClass createClass(SchoolClass schoolClass) {
+        schoolClass.setTeacher(resolveTeacher(schoolClass.getTeacher()));
         return schoolClassRepository.save(schoolClass);
     }
     
@@ -27,9 +28,17 @@ public class SchoolClassServiceImpl implements SchoolClassService {
         SchoolClass existing = schoolClassRepository.findById(id)
                 .orElseThrow(() -> new SchoolClassNotFoundException("Class not found with id: " + id));
         existing.setName(schoolClass.getName());
-        existing.setTeacher(schoolClass.getTeacher());
+        existing.setTeacher(resolveTeacher(schoolClass.getTeacher()));
         existing.setStudents(schoolClass.getStudents());
         return schoolClassRepository.save(existing);
+    }
+
+    private Teacher resolveTeacher(Teacher teacherRef) {
+        if (teacherRef == null || teacherRef.getId() == null || teacherRef.getId().isBlank()) {
+            throw new IllegalArgumentException("teacher.id is required");
+        }
+        return teacherRepository.findById(teacherRef.getId())
+                .orElseThrow(() -> new TeacherNotFoundException("Teacher not found with id: " + teacherRef.getId()));
     }
     
     @Override
