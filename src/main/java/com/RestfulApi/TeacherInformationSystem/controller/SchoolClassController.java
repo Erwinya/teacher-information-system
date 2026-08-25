@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
+import jakarta.validation.Valid;
 
 @RestController
 @AllArgsConstructor
@@ -18,7 +19,7 @@ public class SchoolClassController {
     private final SchoolClassService schoolClassService;
 
     @PostMapping
-    public CustomResponse<SchoolClassDTO> createClass(@RequestBody SchoolClassDTO schoolClassDTO) {
+    public CustomResponse<SchoolClassDTO> createClass(@Valid @RequestBody SchoolClassDTO schoolClassDTO) {
         var createdClass = schoolClassService.createClass(SchoolClassMapper.toEntity(schoolClassDTO));
         return ApiResponseUtil.success(SchoolClassMapper.toDto(createdClass));
     }
@@ -39,7 +40,7 @@ public class SchoolClassController {
     }
 
     @PutMapping("/{id}")
-    public CustomResponse<SchoolClassDTO> updateClass(@PathVariable String id, @RequestBody SchoolClassDTO schoolClassDTO) {
+    public CustomResponse<SchoolClassDTO> updateClass(@PathVariable String id, @Valid @RequestBody SchoolClassDTO schoolClassDTO) {
         var updatedClass = schoolClassService.updateClass(id, SchoolClassMapper.toEntity(schoolClassDTO));
         return ApiResponseUtil.success(SchoolClassMapper.toDto(updatedClass));
     }
