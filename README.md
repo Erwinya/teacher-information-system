@@ -17,6 +17,8 @@ RESTful API for managing teachers, students, school classes, and managers — Sp
 API: http://localhost:8081  
 Swagger: http://localhost:8081/swagger-ui.html
 
+Health: http://localhost:8081/actuator/health
+
 ## Docker
 
 ```bash
